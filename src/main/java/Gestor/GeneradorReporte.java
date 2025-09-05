@@ -2,12 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
-package Gestor;
+package gestor;
+
+import java.util.List;
 
 /**
  *
- * @author Usuario
+ * @author camper
  */
-public interface CalularBonus {
-    
+public interface GeneradorReporte {
+    void generarReportes(List<Equipo> equipos, List<Arbitro> arbitros);
 }

@@ -4,14 +4,14 @@
  */
 package gestor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author camper
  */
-// Objetivo cumplir con el principio SRP 
-
-class Arbitro {
-private final String nombre;
-public Arbitro(String nombre) { this.nombre = nombre; }
-public String getNombre() { return nombre; }
+public class GestorCampeonato {
+private List<Equipo> equipos = new ArrayList<>();
+private List<Arbitro> arbitros = new ArrayList<>();
 }
