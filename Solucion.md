@@ -866,8 +866,7 @@ public class ReporteHtml implements Reporte {
 
 - Se aplicaron los **5 principios SOLID** correctamente.  
 - El diseño ahora es **modular, extensible y mantenible**.  
-- El código se organizó en un paquete único: `com.campeonato.gestor`.  
-- El entregable cumple con el formato solicitado en **Markdown**.
+
 
 
 
