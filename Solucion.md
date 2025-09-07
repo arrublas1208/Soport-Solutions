@@ -524,7 +524,350 @@ public class GestorCampeonato {
 - El sistema queda más flexible, mantenible y escalable.
 
 
+# Código Final Completo
 
+A continuación, todo el código refactorizado dentro del paquete **`com.campeonato.gestor`**.
+
+## App.java
+
+```java
+package com.campeonato.gestor;
+
+public class App {
+    public static void main(String[] args) {
+        GestorCampeonato gestor = new GestorCampeonato();
+        gestor.registrarParticipantes();
+        gestor.calcularBonificaciones();
+
+        System.out.println("\n--- Reportes ---");
+        gestor.generarReportes("TEXTO");
+
+        System.out.println("\n--- más Reportes ---");
+        gestor.generarReportes("HTML");
+    }
+}
+```
+
+## GestorCampeonato.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.*;
+
+public class GestorCampeonato {
+    private ServicioRegistro servicioRegistro;
+    private CalculoBonificacion calculoBonificacion;
+    private GeneradorReporte generadorReporte;
+    private List<Equipo> equipos;
+    private List<Arbitro> arbitros;
+
+    public GestorCampeonato() {
+        this.servicioRegistro = new ServicioRegistro();
+        this.calculoBonificacion = new CalculoBonificacion();
+        this.generadorReporte = new GeneradorReporte();
+        this.equipos = new ArrayList<>();
+        this.arbitros = new ArrayList<>();
+    }
+
+    public void registrarParticipantes() {
+        this.equipos = servicioRegistro.registrarEquipos();
+        this.arbitros = servicioRegistro.registrarArbitros();
+    }
+
+    public void calcularBonificaciones() {
+        for (Equipo equipo : equipos) {
+            for (Jugador jugador : equipo.getJugadores()) {
+                BonificacionStrategy estrategia = BonificacionFactory.obtenerEstrategia(jugador.getPosicion());
+                calculoBonificacion.aplicarBonificacion(jugador, estrategia);
+            }
+        }
+    }
+
+    public void generarReportes(String tipo) {
+        Reporte reporte;
+        if ("TEXTO".equals(tipo)) {
+            reporte = new ReporteTexto();
+        } else {
+            reporte = new ReporteHtml();
+        }
+        generadorReporte.generar(reporte, equipos, arbitros);
+    }
+}
+```
+
+## ServicioRegistro.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.*;
+
+public class ServicioRegistro {
+    public List<Equipo> registrarEquipos() {
+        List<Equipo> equipos = new ArrayList<>();
+
+        Equipo e1 = new Equipo("Dragones");
+        e1.agregarJugador(new Jugador("Carlos", "Delantero"));
+        e1.agregarJugador(new Jugador("Luis", "Portero"));
+        equipos.add(e1);
+
+        Equipo e2 = new Equipo("Tigres");
+        e2.agregarJugador(new Jugador("Ana", "Defensa"));
+        e2.agregarJugador(new Jugador("Marta", "Delantero"));
+        equipos.add(e2);
+
+        return equipos;
+    }
+
+    public List<Arbitro> registrarArbitros() {
+        List<Arbitro> arbitros = new ArrayList<>();
+        arbitros.add(new Arbitro("Pedro"));
+        arbitros.add(new Arbitro("Lucía"));
+        return arbitros;
+    }
+}
+```
+
+## CalculoBonificacion.java
+
+```java
+package com.campeonato.gestor;
+
+public class CalculoBonificacion {
+    public void aplicarBonificacion(Jugador jugador, BonificacionStrategy estrategia) {
+        double bonificacion = estrategia.calcular(jugador);
+        jugador.setBonificacion(bonificacion);
+    }
+}
+```
+
+## GeneradorReporte.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.*;
+
+public class GeneradorReporte {
+    public void generar(Reporte reporte, List<Equipo> equipos, List<Arbitro> arbitros) {
+        reporte.generar(equipos, arbitros);
+    }
+}
+```
+
+## Entidades
+
+### Equipo.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.*;
+
+public class Equipo {
+    private String nombre;
+    private List<Jugador> jugadores;
+
+    public Equipo(String nombre) {
+        this.nombre = nombre;
+        this.jugadores = new ArrayList<>();
+    }
+
+    public void agregarJugador(Jugador jugador) {
+        jugadores.add(jugador);
+    }
+
+    public String getNombre() { return nombre; }
+    public List<Jugador> getJugadores() { return jugadores; }
+}
+```
+
+### Jugador.java
+
+```java
+package com.campeonato.gestor;
+
+public class Jugador {
+    private String nombre;
+    private String posicion;
+    private double bonificacion;
+
+    public Jugador(String nombre, String posicion) {
+        this.nombre = nombre;
+        this.posicion = posicion;
+    }
+
+    public String getNombre() { return nombre; }
+    public String getPosicion() { return posicion; }
+    public double getBonificacion() { return bonificacion; }
+    public void setBonificacion(double bonificacion) { this.bonificacion = bonificacion; }
+}
+```
+
+### Arbitro.java
+
+```java
+package com.campeonato.gestor;
+
+public class Arbitro {
+    private String nombre;
+
+    public Arbitro(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getNombre() { return nombre; }
+}
+```
+
+## Estrategias de Bonificación
+
+### BonificacionStrategy.java
+
+```java
+package com.campeonato.gestor;
+
+public interface BonificacionStrategy {
+    double calcular(Jugador jugador);
+}
+```
+
+### BonificacionDelantero.java
+
+```java
+package com.campeonato.gestor;
+
+public class BonificacionDelantero implements BonificacionStrategy {
+    public double calcular(Jugador jugador) {
+        return 100.0;
+    }
+}
+```
+
+### BonificacionPortero.java
+
+```java
+package com.campeonato.gestor;
+
+public class BonificacionPortero implements BonificacionStrategy {
+    public double calcular(Jugador jugador) {
+        return 80.0;
+    }
+}
+```
+
+### BonificacionDefensa.java
+
+```java
+package com.campeonato.gestor;
+
+public class BonificacionDefensa implements BonificacionStrategy {
+    public double calcular(Jugador jugador) {
+        return 70.0;
+    }
+}
+```
+
+### BonificacionBase.java
+
+```java
+package com.campeonato.gestor;
+
+public class BonificacionBase implements BonificacionStrategy {
+    public double calcular(Jugador jugador) {
+        return 50.0;
+    }
+}
+```
+
+### BonificacionFactory.java
+
+```java
+package com.campeonato.gestor;
+
+public class BonificacionFactory {
+    public static BonificacionStrategy obtenerEstrategia(String posicion) {
+        switch (posicion) {
+            case "Delantero": return new BonificacionDelantero();
+            case "Portero": return new BonificacionPortero();
+            case "Defensa": return new BonificacionDefensa();
+            default: return new BonificacionBase();
+        }
+    }
+}
+```
+
+## Reportes
+
+### Reporte.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.List;
+
+public interface Reporte {
+    void generar(List<Equipo> equipos, List<Arbitro> arbitros);
+}
+```
+
+### ReporteTexto.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.List;
+
+public class ReporteTexto implements Reporte {
+    public void generar(List<Equipo> equipos, List<Arbitro> arbitros) {
+        System.out.println("Reporte en TEXTO:");
+        for (Equipo e : equipos) {
+            System.out.println("Equipo: " + e.getNombre());
+            for (Jugador j : e.getJugadores()) {
+                System.out.println("- " + j.getNombre() + " (" + j.getPosicion() + ") Bonificación: " + j.getBonificacion());
+            }
+        }
+        for (Arbitro a : arbitros) {
+            System.out.println("Arbitro: " + a.getNombre());
+        }
+    }
+}
+```
+
+### ReporteHtml.java
+
+```java
+package com.campeonato.gestor;
+
+import java.util.List;
+
+public class ReporteHtml implements Reporte {
+    public void generar(List<Equipo> equipos, List<Arbitro> arbitros) {
+        System.out.println("<html><body>");
+        System.out.println("<h1>Reporte en HTML</h1>");
+        for (Equipo e : equipos) {
+            System.out.println("<h2>Equipo: " + e.getNombre() + "</h2>");
+            for (Jugador j : e.getJugadores()) {
+                System.out.println("<p>" + j.getNombre() + " - " + j.getPosicion() + " Bonificación: " + j.getBonificacion() + "</p>");
+            }
+        }
+        for (Arbitro a : arbitros) {
+            System.out.println("<p>Arbitro: " + a.getNombre() + "</p>");
+        }
+        System.out.println("</body></html>");
+    }
+}
+```
+
+---
+
+# ✅ Conclusión
+
+- Se aplicaron los **5 principios SOLID** correctamente.  
+- El diseño ahora es **modular, extensible y mantenible**.  
+- El código se organizó en un paquete único: `com.campeonato.gestor`.  
+- El entregable cumple con el formato solicitado en **Markdown**.
 
 
 
