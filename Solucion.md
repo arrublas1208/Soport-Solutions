@@ -158,3 +158,37 @@ class Equipo {
 
 ## 2. **OCP** (Open/Closed Principle)
 
+en las funcionalidades de cálculo de bonificaciones y generación de reportes, ya que en el código original se usaban múltiples condicionales if/else que obligaban a modificar la clase cada vez que aparecía un nuevo tipo de jugador o un nuevo formato de reporte
+
+
+🔧 Código Anterior (Violación OCP)
+// Dentro de la clase GestorCampeonato
+
+// Cálculo de bonificaciones
+for (Jugador jugador : equipo.getJugadores()) {
+    if (jugador.getPosicion().equals("Delantero")) {
+        System.out.println("Calculando bonificación alta para Delantero: " + jugador.getNombre());
+    } else if (jugador.getPosicion().equals("Portero")) {
+        System.out.println("Calculando bonificación estándar para Portero: " + jugador.getNombre());
+    } else {
+        System.out.println("Calculando bonificación base para: " + jugador.getNombre());
+    }
+}
+
+// Generación de reportes
+if (formato.equalsIgnoreCase("TEXTO")) {
+    // Genera el reporte en texto
+} else if (formato.equalsIgnoreCase("HTML")) {
+    // Genera el reporte en HTML
+}
+
+## Problema 
+Cada vez que agregamos una nueva posición (ej. "Mediocampista") o un nuevo formato de reporte (ej. JSON), debemos modificar el código existente, rompiendo OCP.
+
+
+
+
+
+
+
+
